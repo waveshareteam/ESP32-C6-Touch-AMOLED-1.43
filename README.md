@@ -1,2 +1,7 @@
 # ESP32-C6-Touch-AMOLED-1.43
-This is the code repository for Waveshare’s ESP32-C6-Touch-AMOLED-1.43 product.
+
+中文wiki链接: https://www.waveshare.net/wiki/ESP32-C6-Touch-AMOLED-1.43<br>
+Product English wiki link: https://www.waveshare.com/wiki/ESP32-C6-Touch-AMOLED-1.43
+
+# Arduino example Tools configuration
+![alt text](<Tools Configuration.png>)
