@@ -260,7 +260,7 @@ void user_app_init(void)
   xTaskCreatePinnedToCore(example_sdcard_task, "example_sdcard_task", 2 * 1024, &user_ui, 2, NULL,0);      //sd card测试
 #endif 
   xTaskCreatePinnedToCore(example_user_task, "example_user_task", 4 * 1024, &user_ui, 2, NULL,0);          //用户事件
-xTaskCreatePinnedToCore(example_button_task, "example_button_task", 4 * 1024, &user_ui, 2, NULL,0);      //按钮事件  
+  xTaskCreatePinnedToCore(example_button_task, "example_button_task", 4 * 1024, &user_ui, 2, NULL,0);      //按钮事件  
   xTaskCreatePinnedToCore(example_color_task, "example_color_task", 4 * 1024, &user_ui, 2, NULL,0);        //RGB颜色测试
   xTaskCreatePinnedToCore(example_scan_wifi_ble_task, "example_scan_wifi_ble_task", 3 * 1024,&user_ui, 2, NULL,0);   
   xTaskCreatePinnedToCore(i2s_audio_Test, "i2s_audio_Test", 4 * 1024, &audio_Test_flag, 2, NULL,0);           
