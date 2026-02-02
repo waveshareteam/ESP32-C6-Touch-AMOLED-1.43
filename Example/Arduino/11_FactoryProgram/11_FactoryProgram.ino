@@ -27,8 +27,8 @@ bool is_music = 0;
 
 void Tca9554_Init(void) {
   ESP_ERROR_CHECK(esp_io_expander_new_i2c_tca9554(i2cbus.Get_I2cBusHandle(), ESP_IO_EXPANDER_I2C_TCA9554_ADDRESS_000, &io_expander));
-  ESP_ERROR_CHECK(esp_io_expander_set_dir(io_expander, IO_EXPANDER_PIN_NUM_7, IO_EXPANDER_OUTPUT));
-  ESP_ERROR_CHECK(esp_io_expander_set_level(io_expander, IO_EXPANDER_PIN_NUM_7, 1));
+  ESP_ERROR_CHECK(esp_io_expander_set_dir(io_expander, IO_EXPANDER_PIN_NUM_7 | IO_EXPANDER_PIN_NUM_6, IO_EXPANDER_OUTPUT));
+  ESP_ERROR_CHECK(esp_io_expander_set_level(io_expander, IO_EXPANDER_PIN_NUM_7 | IO_EXPANDER_PIN_NUM_6, 1));
 }
 
 void Custom_ColorTask(void *arg) {
@@ -66,6 +66,15 @@ void Custom_ColorTask(void *arg) {
     Lvgl_unlock();
   }
   vTaskDelete(NULL);
+}
+
+void Custom_PWRButtonTask(void *arg) {
+  for (;;) {
+    EventBits_t even = xEventGroupWaitBits(PWRButtonGroups, GroupSetBitsMax, pdTRUE, pdFALSE, pdMS_TO_TICKS(2 * 1000));
+    if (even & GroupBit2) {
+      ESP_ERROR_CHECK(esp_io_expander_set_level(io_expander,IO_EXPANDER_PIN_NUM_6, 0));
+    }
+  }
 }
 
 void Custom_BottButtonTask(void *arg) {
@@ -293,6 +302,7 @@ void Lvgl_Slider_Event_Callback(lv_event_t *e) {
 void setup() {
   ContsGroups = xEventGroupCreate();
   Serial.begin(115200);
+  Tca9554_Init();
   display = new DisplayPort(i2cbus, 466, 466);
   display->DisplayPort_TouchInit();
   Lvgl_PortInit(*display);
@@ -301,7 +311,6 @@ void setup() {
   I2cRtcSetup(&i2cbus, 0x51);
   Set_I2cRtcTime(2026, 1, 1, 0, 0, 0);
   I2cQmiSetup(&i2cbus, 0x6b);
-  Tca9554_Init();
   codecport = new CodecPort(i2cbus,"C6_AMOLED_1_43");
   xEventGroupSetBits(ContsGroups,GroupBit2); /*echo*/
 #if ESP32_SDCARD_EN
@@ -312,8 +321,15 @@ void setup() {
     setup_ui(&src_ui);
     Lvgl_unlock();
   }
+  while(0 == gpio_get_level(GPIO_NUM_2)) {
+    Serial.print(".");
+    vTaskDelay(pdMS_TO_TICKS(200));
+  }
+  xEventGroupClearBits(PWRButtonGroups,GroupSetBitsMax);
+  xEventGroupClearBits(BootButtonGroups,GroupSetBitsMax);
   xTaskCreate(Custom_ColorTask, "Custom_ColorTask", 4 * 1024, NULL, 2, NULL);
   xTaskCreate(Custom_BottButtonTask, "Custom_BottButtonTask", 4 * 1024, NULL, 2, NULL);
+  xTaskCreate(Custom_PWRButtonTask, "Custom_PWRButtonTask", 4 * 1024, NULL, 2, NULL);
   xTaskCreate(Custom_UserTask, "Custom_UserTask", 4 * 1024, NULL, 2, NULL);
   xTaskCreate(Custom_TouchTestTask, "Custom_TouchTestTask", 4 * 1024, NULL, 2, NULL);
   xTaskCreate(Custom_AudioTestTask, "Custom_AudioTestTask", 4 * 1024, NULL, 2, NULL);

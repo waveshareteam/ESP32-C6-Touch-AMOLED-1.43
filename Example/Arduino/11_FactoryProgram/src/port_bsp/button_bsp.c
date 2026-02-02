@@ -36,15 +36,15 @@ static void on_boot_press_up(Button *btn_handle) {
 }
 
 
-static void on_gp18_single_click(Button *btn_handle) {
+static void on_gp2_single_click(Button *btn_handle) {
     xEventGroupSetBits(PWRButtonGroups, GroupBit0);
 }
 
-static void on_gp18_double_click(Button *btn_handle) {
+static void on_gp2_double_click(Button *btn_handle) {
     xEventGroupSetBits(PWRButtonGroups, GroupBit1);
 }
 
-static void on_gp18_long_press_start(Button *btn_handle) {
+static void on_gp2_long_press_start(Button *btn_handle) {
     xEventGroupSetBits(PWRButtonGroups, GroupBit2);
 }
 
@@ -89,9 +89,9 @@ void Custom_ButtonInit(void) {
     button_attach(&BootButton, BTN_PRESS_UP, on_boot_press_up);                 // Long press event
 
     button_init(&PWRButton, read_button_GPIO, PWR_Active, PWR_ID);           
-    button_attach(&PWRButton, BTN_SINGLE_CLICK, on_gp18_single_click);         
-    button_attach(&PWRButton, BTN_DOUBLE_CLICK, on_gp18_double_click);         
-    button_attach(&PWRButton, BTN_LONG_PRESS_START, on_gp18_long_press_start);
+    button_attach(&PWRButton, BTN_SINGLE_CLICK, on_gp2_single_click);         
+    button_attach(&PWRButton, BTN_DOUBLE_CLICK, on_gp2_double_click);         
+    button_attach(&PWRButton, BTN_LONG_PRESS_START, on_gp2_long_press_start);
 
     esp_timer_create_args_t clock_tick_timer_args = {};
     clock_tick_timer_args.callback                = &clock_task_callback;
